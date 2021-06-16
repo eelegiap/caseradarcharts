@@ -8,16 +8,21 @@
 
         if (index === undefined) {
             d3.select('#output').style('display', 'none')
-// need this back later
-            // draw_skeleton(data, label_lookup, 'basic');
+            draw_skeleton(data, label_lookup, 'basic');
             $("#error").show();
             return false;
         }
         var label = data[index].pair;
         var full_data = data[index].data;
-        console.log(full_data)
+
         $('#input-word').text(input_text)
         $("#pair").text(label);
+        if (full_data['pos'] == 'A') {
+            $('#pos').text('Adjective')
+        } else {
+            $('#pos').text('Noun')
+        }
+        
         d3.select('#output').style('display', 'block')
 
         var complexity_key
@@ -69,7 +74,7 @@
             radians: 2 * Math.PI,
             opacityArea: 0.5,
             ToRight: 5,
-            TranslateX: 80,
+            TranslateX: 120,
             TranslateY: 30,
             ExtraWidthX: 100,
             ExtraWidthY: 100,
@@ -201,21 +206,7 @@
         // labeling the radar vertices
         var radLabels = axis.append("text")
             .attr("class", "legend")
-            .text(function (d, i) {
-                var new_label;
-                // NEED to FIX
-                // if (d.includes('conjugated')) {
-                //     var example = d.split('conjugated ')[1]
-                //     if ('singular' == 'singular') {
-                //         new_label = 'present'
-                //     } else {
-                //         new_label = 'future'
-                //     }
-                // } else {
-                new_label = d
-                // }
-                return new_label
-            })
+            .text(function (d) {return d})
             .attr("text-anchor", "middle")
             .attr("dy", "1.5em")
             .attr("fill", "gray")
