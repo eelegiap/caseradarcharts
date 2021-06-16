@@ -14,6 +14,7 @@
         }
         var label = data[index].pair;
         var full_data = data[index].data;
+        console.log(full_data)
 
         $('#input-word').text(input_text)
         $("#pair").text(label);
@@ -33,6 +34,7 @@
                 nums.push(qty)
             }
         });
+        console.log(nums)
         // get chart data
         var chart_data = []
         var num_info = []
@@ -48,18 +50,11 @@
 
         var id = '#chart'
 
-        // var colorRange = ['#ED7D31', '#0086C0', '#AF5BA6', 'gray']
         var colorRange = ["#FFD700", "#00BFFF", '#AF5BA6', 'gray']
-        // var lightColorRange = {
-        //     "singular": '#ed7c31a1',
-        //     "plural": '#0086C0a1',
-        //     "binumual": '#AF5BA6a1',
-        //     "no num assigned": 'lightgray'
-        // }
         var lightColorRange = {
-            "singular": '#fff6c4',
-            "plural": '#9de6ff',
-            "binumual": '#AF5BA6a1',
+            "sg": '#fff6c4',
+            "pl": '#9de6ff',
+            "n/a": '#AF5BA6a1',
             "no num assigned": 'lightgray'
         }
         // formatting
@@ -79,7 +74,7 @@
             ExtraWidthX: 100,
             ExtraWidthY: 100,
             color: d3.scaleOrdinal()
-                .domain(['singular', 'plural', 'binumual', 'no num assigned'])
+                .domain(['sg', 'pl', 'n/a', 'no num assigned'])
                 .range(colorRange)
         };
 
@@ -410,8 +405,6 @@
             $("#error").show();
             return false;
         }
-
-        var full_data = data[index].data.basic;
         var full_data = data[index].data;
         // data
         var d = []
@@ -526,7 +519,7 @@
     }
     $(document).ready(async function () {
         console.log("ready!");
-        $.getJSON("todays_CASEDATA.json", function (data) {
+        $.getJSON("case_data.json", function (data) {
             var previous_input = ''
             // create lookup from lemma to array number to avoid looping every time
             var label_lookup = new Object();
