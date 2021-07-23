@@ -14,7 +14,7 @@
         }
         var label = data[index].pair;
         var full_data = data[index].data;
-        console.log(full_data)
+        console.log('full data', full_data)
 
         $('#input-word').text(input_text)
         $("#pair").text(label);
@@ -26,7 +26,6 @@
         
         d3.select('#output').style('display', 'block')
 
-        var complexity_key
         var nums = []
 
         Object.keys(full_data[complexity]).forEach(function(qty) {
@@ -34,19 +33,40 @@
                 nums.push(qty)
             }
         });
-        console.log(nums)
+        console.log('nums',nums)
+
         // get chart data
         var chart_data = []
         var num_info = []
-        nums.forEach(function(qty) {
-            chart_data.push(full_data[complexity][qty].data)
-            num_info.push({
-                "num": qty,
-                "label": full_data[complexity][qty].form
+
+        // if detailed, sort qtydata in alpha axis order
+        if (complexity == 'detailed') {
+            nums.forEach(function(qty) {
+                var qtydata = full_data[complexity][qty].data
+                qtydata.sort(function(a,b) { 
+                    var vtxA = a['axis'].split(' ')[2]; var vtxB = b['axis'].split(' ')[2]
+                    if (vtxA < vtxB) { return -1 } else { return 1 }
+                })
             })
+        }
+        ['sg','pl'].forEach(function(qty) { d3.select('#'+qty).text('0') })
+        // populate chart data
+        nums.forEach(function(qty) {
+            var data = full_data[complexity][qty].data
+            chart_data.push(data)
+            var qtyTotal = 0; data.forEach(function(d) { qtyTotal += d.value })
+            num_info.push({
+                'num': qty,
+                'label': full_data[complexity][qty].label,
+            })
+            if (qty ==  'n/a') {
+                d3.select('#na').text(qtyTotal)
+            } else {
+                d3.select('#'+qty).text(qtyTotal)
+            }
         })
+        console.log('num_info',num_info)
         d3.select('#tr-label').text(label + ' translation: ')
-        var translation_found = false
 
         var id = '#chart'
 
@@ -70,62 +90,13 @@
             opacityArea: 0.5,
             ToRight: 5,
             TranslateX: 120,
-            TranslateY: 30,
+            TranslateY: 18,
             ExtraWidthX: 100,
             ExtraWidthY: 100,
             color: d3.scaleOrdinal()
                 .domain(['sg', 'pl', 'n/a', 'no num assigned'])
                 .range(colorRange)
         };
-
-        // set colored verb labels for toggle
-        if (num_info.length == 1) {
-            d3.select('#verb2').style('display', 'none')
-        } else {
-            d3.select('#verb2').style('display', 'inline-block')
-        }
-        num_info.forEach(function (num, i) {
-            var verblabel = d3.select('#verb' + (i + 1))
-                .classed('activated', true)
-                .style('background-color', function () {
-                    return lightColorRange[num.num];
-                })
-                .style('border', '1px solid black')
-                .style('border-radius', '3px')
-                .text(num.label)
-
-            verblabel.on('click', function () {
-                var series = d3.selectAll(".radar-chart-serie" + i);
-                var currentOpacity = $(".radar-chart-serie" + i).css('opacity');
-                if (currentOpacity == 0) {
-                    series.style('opacity', 1)
-                    d3.select(this).classed('activated', true)
-                    d3.select(this).style('background-color', function () { return lightColorRange[num.num] })
-                    d3.select('.output' + (i + 1)).style('opacity', 1)
-                } else {
-                    series.style('opacity', 0)
-                    d3.select(this).classed('activated', false)
-                    d3.select(this).style('background-color', 'white')
-                    d3.select('.output' + (i + 1)).style('opacity', 0)
-                }
-            })
-            verblabel.on('mouseover', function () {
-                var thisclass = d3.select(this).attr('class')
-                if (thisclass.includes('activated')) {
-                    d3.select(this).style('background-color', function () { return cfg.color(num.num) })
-                } else {
-                    d3.select(this).style('background-color', 'white')
-                }
-            })
-            verblabel.on('mouseout', function () {
-                var thisclass = d3.select(this).attr('class')
-                if (thisclass.includes('activated')) {
-                    d3.select(this).style('background-color', function () { return lightColorRange[num.num] })
-                } else {
-                    d3.select(this).style('background-color', 'white')
-                }
-            })
-        })
 
         d3.selectAll('.toggle')
             .transition()
@@ -200,19 +171,14 @@
 
         // labeling the radar vertices
         var radLabels = axis.append("text")
-            .attr("class", "legend")
-            .text(function (d) {return d})
+            .attr("class", "legend ")
+            .attr("id", function(d) { return d.replaceAll(' ','').replace('+','') })
+            .text(function (d) { return d })
             .attr("text-anchor", "middle")
             .attr("dy", "1.5em")
             .attr("fill", "gray")
             .attr("transform", function (d, i) { return "translate(0, -10)" })
             .attr("x", function (d, i) {
-                if (d.includes('imperative') && (i == 6)) {
-                    return (cfg.w / 2 * (1 - cfg.factorLegend * Math.sin(i * cfg.radians / total)) - 60 * Math.sin(i * cfg.radians / total) - d.length);
-                }
-                if (d.includes('1sg') && (i == 7)) {
-                    return (cfg.w / 2 * (1 - cfg.factorLegend * Math.sin(i * cfg.radians / total)) - 60 * Math.sin(i * cfg.radians / total) + d.length);
-                }
                 return cfg.w / 2 * (1 - cfg.factorLegend * Math.sin(i * cfg.radians / total)) - 60 * Math.sin(i * cfg.radians / total);
             })
             .attr("y", function (d, i) { return cfg.h / 2 * (1 - Math.cos(i * cfg.radians / total)) - 20 * Math.cos(i * cfg.radians / total); });
@@ -292,10 +258,7 @@
                 .style("fill-opacity", cfg.opacityArea)
                 // polygon hover
                 .on('mouseover', function () {
-                    d3.select('#verbnum')
-                        .append('span')
-                        .text(this_num + ': ' + verb_label)
-                        .style('color', function () { return cfg.color(this_num) })
+                    // polygon hover
                     z = "polygon." + d3.select(this).attr("class");
                     g.selectAll("polygon")
                         .transition(200)
@@ -303,9 +266,9 @@
                     g.selectAll(z)
                         .transition(200)
                         .style("fill-opacity", .7);
+                    d3.select('radius')
                 })
                 .on('mouseout', function () {
-                    d3.select('#verbnum').select('span').remove()
                     g.selectAll("polygon")
                         .transition(200)
                         .style("fill-opacity", cfg.opacityArea);
@@ -328,10 +291,7 @@
 
         // draws circle vertices of polygon
         chart_data.forEach(function (y, i) {
-            var this_num_info = num_info[i]
-            var verb_label = this_num_info.label
-            var this_num = this_num_info.num
-
+            var qty = num_info[i].num
             var vertices = g.selectAll(".nodes")
                 .data(y).enter()
                 .append("svg:circle")
@@ -352,10 +312,18 @@
                     return cfg.h / 2 * (1 - (Math.max(j.value, 0) / cfg.maxValue) * cfg.factor * Math.cos(i * cfg.radians / total));
                 })
                 .attr("data-id", function (j) { return j.axis })
-                .style("fill", cfg.color(this_num)).style("fill-opacity", 0)
+                .style("fill", cfg.color(qty)).style("fill-opacity", 0)
 
                 // node hover
-                .on('mouseover', function (d) {
+                .on('mouseover', function (d,i) {
+                    // display form at vertex
+                    var axis = d.axis.replaceAll(' ','').replace('+','')
+                    var newlabel = d.axis + ': '+d.form+' ('+qty+')'
+                    d3.select('#'+axis)
+                        .text(newlabel)
+                        .attr('transform', 'translate('+newlabel.length*1.5+',-10)')
+
+                    // vertex number label
                     newX = parseFloat(d3.select(this).attr('cx')) - 10;
                     newY = parseFloat(d3.select(this).attr('cy')) - 5;
 
@@ -419,6 +387,8 @@
         // get chart data
         var chart_data = []
         var num_info = []
+
+        // else the order is fine
         nums.forEach(function(qty) {
             chart_data.push(full_data[complexity][qty].data)
             num_info.push({
@@ -426,6 +396,7 @@
                 "label": full_data[complexity][qty].form
             })
         })
+
 
         var id = '#chart'
 
