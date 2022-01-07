@@ -2,7 +2,7 @@
     async function make_radar(data, label_lookup, complexity, skeleton) {
         $("#error").hide();
         d3.select('#sentences').html('')
-
+        d3.select('#vertexcx').text('(choose a vertex)')
         // for both SKELETON and RADAR
         // get element ID
         var id = '#chart'
@@ -179,7 +179,6 @@
             .style("stroke", "grey")
             .style("stroke-width", "1px")
 
-
         // labeling the radar vertices
         var caseColor = d3.scaleOrdinal()
             .domain(['N', 'A', 'G', 'L', 'D', 'I'])
@@ -247,10 +246,11 @@
         // filling in radar chart if not skel
         if (!skeleton) {
             // display sentence examples
-            $.getJSON('1-7_examples/'+input_text+'.json', function(examples) {
-                const senthtml = Array()
+            $.getJSON('1-7_examples2/'+input_text+'.json', function(examples) {
                 radLabels.on('click',function(vertexCase) {
+                    d3.select('#vertexcx').text(vertexCase)
                     if (complexity == 'basic') {
+                        var senthtml = Array()
                         // console.log(Object.values(examples[vertexCase]))
                         Object.values(examples[vertexCase]).forEach(function(sentarr) {
                             sentarr.forEach(function(sent) {
@@ -259,8 +259,14 @@
                         })
                         d3.select('#sentences').html(senthtml.join('<br>'))
                     } else {
-                        senthtml = examples[vertexCase]
-                        d3.select('#sentences').html(senthtml.join('<br>'))
+                        var basecase = vertexCase.split(' ')[2]
+                        var specificcx = vertexCase
+                        if (vertexCase.split(' ')[0] == 'No') {
+                            specificcx = 'NO_PREPOSITION'
+                        }
+                        console.log(examples)
+                        console.log(basecase, specificcx)
+                        d3.select('#sentences').html(examples[basecase][specificcx].join('<br><br>'))
                     }
                 })
             
