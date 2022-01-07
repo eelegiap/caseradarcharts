@@ -41,6 +41,8 @@
     .legend {
         font-size: 15px;
         font-family: sans-serif;
+        font-weight: bold;
+        cursor: pointer
     }
 
     .tooltip {
@@ -69,27 +71,39 @@
         opacity: 0;
         cursor: pointer;
     }
+
     #error {
         color: tomato;
         margin-top: 10px;
         display: none;
     }
+
     #output {
         display: none;
+    }
+    .bordered {
         padding: 5px;
         border: 1px solid gray;
     }
+
     .singular {
         color: #FFD700;
     }
+
     .plural {
         color: #00BFFF;
     }
-    .biaspectual {
-        color: #AF5BA6
+
+    .center {
+        display: block;
+        margin-left: auto;
+        margin-right: auto;
+        width: 50%;
+        transform: scale(.25)
     }
-    .noaspect {
-        color: gray;
+    #examplediv {
+        max-height: 500px;
+        overflow: scroll
     }
 </style>
 
@@ -119,7 +133,7 @@
                 Distribution of word by number and case in the RNC:
                 <span class='singular'>Singular, </span>
                 <span class='plural'>Plural, </span>
-                <span class='biaspectual'>Irregular</span>
+                <!-- <span class='biaspectual'>Irregular</span> -->
             </p>
 
             <textarea id="contentinput" placeholder="Enter noun or adjective to generate radar chart"
@@ -141,29 +155,31 @@
                     <i id="processing_indicator" class="spinner-border" role="status"
                         style="display:none;"></i></button>
             </div>
-            <p><span id="error">Word not found in the database. Try the dictionary form (nominative singular) or an alternate spelling.</span></p>
+            <p><span id="error">Word not found in the database. Try the dictionary form (nominative singular) or an
+                    alternate spelling.</span></p>
         </div>
     </div>
     <div class="row" style="background-color: white;">
-        <div class="col-md-4">
+        <div class="col-md-5">
             <div id='output'>
-                <!-- <div class='toggle' id='verb1'></div>
-                <div class='toggle' id='verb2'></div> -->
-                <p><span style='font-weight: bold;'>Input word: </span><span id='input-word'></span></p>
-                <p><span style='font-weight: bold;'>Part of speech: </span><span id='pos'></span></p>
-                <p><span style='font-weight: bold;'>Singular: </span><span id='sg'></span></p>
-                <p><span style='font-weight: bold;'>Plural: </span><span id='pl'></span></p>
-                <p style='display: none'><span style='font-weight: bold;'>N/A: </span><span id='na'></span></p>
+                <div class='bordered'>
+                    <p><span style='font-weight: bold;'>Input word: </span><span id='input-word'></span></p>
+                    <p><span style='font-weight: bold;'>Part of speech: </span><span id='pos'></span></p>
+                    <p><span style='font-weight: bold;'>Singular: </span><span id='Sing'></span></p>
+                    <p><span style='font-weight: bold;'>Plural: </span><span id='Plur'></span></p>
+                </div>
                 <br>
-                <div id='gauge' style='width: 150'></div>
-                <!-- <p id='vertexinfo'></p> -->
-                <!-- <p id='verbaspect'></p> -->
+                <div id='examplediv' class='bordered'>
+                    <h4>Example sentences</h4>
+                    <div id='sentences'></div>
+                </div>
+                <br><br><br>
             </div>
         </div>
-        <div class=col-md-8 id="chart">
+        <div class=col-md-6 id="chart">
+            <img id='loading' src='Rainbow.gif' class='center'>
         </div>
     </div>
 </div>
 
 <script src='case_chart.js'></script>
-<script src='gauges.js'></script>
