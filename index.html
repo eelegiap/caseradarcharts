@@ -44,6 +44,9 @@
         font-weight: bold;
         cursor: pointer
     }
+    .legend:hover {
+        text-decoration: underline;
+    }
 
     .tooltip {
         font-size: 15px;
@@ -165,12 +168,16 @@
                 <div class='bordered'>
                     <p><span style='font-weight: bold;'>Input word: </span><span id='input-word'></span></p>
                     <p><span style='font-weight: bold;'>Part of speech: </span><span id='pos'></span></p>
-                    <p><span style='font-weight: bold;'>Singular: </span><span id='Sing'></span></p>
-                    <p><span style='font-weight: bold;'>Plural: </span><span id='Plur'></span></p>
+                    <p><span style='font-weight: bold;'>Total singular instances in corpus: </span><span id='Sing'></span></p>
+                    <p><span style='font-weight: bold;'>Total plural instances in corpus: </span><span id='Plur'></span></p>
                 </div>
                 <br>
                 <div id='examplediv' class='bordered'>
-                    <h4>Example sentences for <span id='vertexcx'></span></h4>
+                    <h4>Example sentences for <span id='vertexSelect' style='color: gray'></span></h4>
+                    <h5>
+                        <span> Singular (<span id='Singct'></span>)</span>
+                        <span> Plural (<span id='Plurct'></span>)</span>
+                    </h5>
                     <div id='sentences'></div>
                 </div>
                 <br><br><br>
