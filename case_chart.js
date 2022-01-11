@@ -301,6 +301,7 @@
                         else {
                             var basecase = vertexCase.split(' ')[2]
                             var cx = vertexCase.split(' ')[0]
+                            d3.select('#vertexSelect').text(cx+' + '+fullnameCases[basecase])
                         }
                         var sentlist = examples[basecase][cx].map(function(sent) {
                         if (sent.includes('[Sing]')) {
